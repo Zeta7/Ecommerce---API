@@ -14,6 +14,20 @@ const createUserValidations = [
     .withMessage('Password must be at least 8 characters long'),
 ];
 
+const createProductValidations = [
+  body('title').notEmpty().withMessage('title cannot be empty'),
+  body('price')
+    .notEmpty()
+    .withMessage('price cannot be empty')
+    .isNumeric()
+    .withMessage('Must be a valid number'),
+  body('quantity')
+    .notEmpty()
+    .withMessage('quantity cannot be empty')
+    .isNumeric()
+    .withMessage('Must be a valid number'),
+];
+
 const checkValidations = (req, res, next) => {
   const errors = validationResult(req);
 
@@ -32,6 +46,7 @@ const checkValidations = (req, res, next) => {
   next();
 };
 module.exports = {
+  createProductValidations,
   createUserValidations,
   checkValidations,
 };

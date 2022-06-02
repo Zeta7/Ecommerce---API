@@ -4,6 +4,7 @@ const rateLimit = require('express-rate-limit');
 const { globalErrorHandler } = require('./controllers/Error_controller');
 
 const { usersRouter } = require('./routes/User_routes');
+const { productsRouter } = require('./routes/Product_routes');
 
 const app = express();
 
@@ -24,6 +25,7 @@ app.use(limiter);
 
 //-------------------- Endpoints -------------------------
 app.use('/api/v1/users', usersRouter);
+app.use('/api/v1/products', productsRouter);
 
 //Global error handler
 app.use('*', globalErrorHandler);
