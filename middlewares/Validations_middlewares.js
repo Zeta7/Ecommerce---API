@@ -1,7 +1,8 @@
 const { body, validationResult } = require('express-validator');
+const { AppError } = require('../utils/appError');
 
 const createUserValidations = [
-  body('name').notEmpty().withMessage('Name cannot be empty'),
+  body('userName').notEmpty().withMessage('Name cannot be empty'),
   body('email')
     .notEmpty()
     .withMessage('Email cannot be empty')
@@ -14,18 +15,25 @@ const createUserValidations = [
     .withMessage('Password must be at least 8 characters long'),
 ];
 
+const createCategoryValidations = [
+  body('name').notEmpty().withMessage('Name cannot be empty'),
+];
+
 const createProductValidations = [
-  body('title').notEmpty().withMessage('title cannot be empty'),
+  body('title').notEmpty().withMessage('Title cannot be empty'),
+  body('description').notEmpty().withMessage('Description cannot be empty'),
   body('price')
-    .notEmpty()
-    .withMessage('price cannot be empty')
-    .isNumeric()
-    .withMessage('Must be a valid number'),
+    .isFloat({ min: 0 })
+    // .custom(val => {
+    //   return val > 0;
+    // })
+    .withMessage('Price must be greater than 0'),
   body('quantity')
-    .notEmpty()
-    .withMessage('quantity cannot be empty')
-    .isNumeric()
-    .withMessage('Must be a valid number'),
+    .isInt({ min: 1 })
+    .withMessage('Quantity must be greater than 0'),
+  body('categoryId')
+    .isInt({ min: 1 })
+    .withMessage('Must provide a valid category'),
 ];
 
 const checkValidations = (req, res, next) => {
@@ -48,5 +56,6 @@ const checkValidations = (req, res, next) => {
 module.exports = {
   createProductValidations,
   createUserValidations,
+  createCategoryValidations,
   checkValidations,
 };

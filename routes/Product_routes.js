@@ -11,7 +11,7 @@ const {
 } = require('../middlewares/User_middlewares');
 
 const { productExists } = require('../middlewares/Product_middlewares');
-const { CategoryExists } = require('../middlewares/Category_middlewares');
+
 const {
   createNewCategory,
   createProduct,
@@ -35,7 +35,8 @@ router
   .get(productExists, getProductById)
   .patch(productExists, protectAccountOwner, updateProduct)
   .delete(productExists, protectAccountOwner, deleteProduct);
+
 router.route('/categories').get(getAllCategories).post(createNewCategory);
-router.patch('/categories/:id', CategoryExists, updateCategory);
+router.patch('/categories/:id', updateCategory);
 
 module.exports = { productsRouter: router };

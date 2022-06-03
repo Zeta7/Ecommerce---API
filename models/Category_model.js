@@ -1,7 +1,7 @@
 const { DataTypes } = require('sequelize');
 const { DataBase } = require('../utils/dataBase');
 
-const Category = DataBase.define('category', {
+const Category = DataBase.define('categorie', {
   id: {
     primaryKey: true,
     autoIncrement: true,
