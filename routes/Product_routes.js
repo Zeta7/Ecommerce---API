@@ -10,7 +10,10 @@ const {
   protectToken,
 } = require('../middlewares/User_middlewares');
 
-const { productExists } = require('../middlewares/Product_middlewares');
+const {
+  productExists,
+  protectProductOwner,
+} = require('../middlewares/Product_middlewares');
 
 const {
   createNewCategory,
@@ -23,20 +26,30 @@ const {
   updateProduct,
 } = require('../controllers/Products_controller');
 
+const { multerUpload } = require('../utils/multer');
+
 const router = express.Router();
 
+router.get('/categories', getAllCategories);
+router.get('/:id', productExists, getProductById);
+router.get('/', getAllProducts);
+
 router.use(protectToken);
-router
-  .route('/')
-  .post(createProductValidations, checkValidations, createProduct)
-  .get(getAllProducts);
+
+router.post(
+  '/',
+  multerUpload.fields([{ name: 'productImg', maxCount: 2 }]),
+  createProductValidations,
+  checkValidations,
+  createProduct
+);
+
 router
   .route('/:id')
-  .get(productExists, getProductById)
-  .patch(productExists, protectAccountOwner, updateProduct)
-  .delete(productExists, protectAccountOwner, deleteProduct);
+  .patch(productExists, protectProductOwner, updateProduct)
+  .delete(productExists, protectProductOwner, deleteProduct);
 
-router.route('/categories').get(getAllCategories).post(createNewCategory);
+router.post('/categories', createNewCategory);
 router.patch('/categories/:id', updateCategory);
 
 module.exports = { productsRouter: router };

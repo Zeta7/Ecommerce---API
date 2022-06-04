@@ -1,7 +1,13 @@
+const { ref, uploadBytes } = require('firebase/storage');
+
 const { catchAsync } = require('../utils/CatchAsync');
 const { Product } = require('../models/Product_model');
 const { Category } = require('../models/Category_model');
+const { ProductImg } = require('../models/ProductImg_model');
+const { User } = require('../models/User_model');
 const { AppError } = require('../utils/AppError');
+
+const { Storage } = require('../utils/Firebase');
 
 //--------------------------- create Product ----------------------
 const createProduct = catchAsync(async (req, res, next) => {
@@ -16,24 +22,41 @@ const createProduct = catchAsync(async (req, res, next) => {
     categoryId,
     userId: sessionUser.id,
   });
-  res.status(201).json({ status: 'success', newProduct });
+
+  const imgsPromises = req.files.productImg.map(async img => {
+    const imgName = `/img/products/${newProduct.id}-${sessionUser.id}-${img.originalname}`;
+    const imgRef = ref(Storage, imgName);
+
+    const result = await uploadBytes(imgRef, img.buffer);
+
+    await ProductImg.create({
+      imgUrl: result.metadata.fullPath,
+      productId: newProduct.id,
+    });
+  });
+
+  await Promise.all(imgsPromises);
+
+  res.status(201).json({ status: 'success', data: { newProduct } });
 });
 
 //------------------------ get all products -------------------------
 const getAllProducts = catchAsync(async (req, res, next) => {
-  const products = await Product.findAll({ where: { status: 'active' } });
-
-  res.status(200).json({
-    products,
+  const products = await Product.findAll({
+    where: { status: 'active' },
+    include: [
+      { model: Category, attributes: ['name'] },
+      { model: User, attributes: ['userName', 'email'] },
+    ],
   });
+  res.status(200).json({ products });
 });
 
 //----------------------- get product by id -------------------------
 const getProductById = catchAsync(async (req, res, next) => {
-  const { product } = req; //product exist
-  response.status(200).json(product);
+  const { product } = req;
+  res.status(200).json({ product });
 });
-
 //---------------------- update Product ------------------------------
 const updateProduct = catchAsync(async (req, res, next) => {
   const { product } = req; //product exist
@@ -41,8 +64,8 @@ const updateProduct = catchAsync(async (req, res, next) => {
   const updateProd = await product.update({
     title,
     description,
-    price,
     quantity,
+    price,
   });
   res.status(200).json({ status: 'success', updateProd });
 });
@@ -59,6 +82,7 @@ const deleteProduct = catchAsync(async (req, res, next) => {
 
 //------------------------ get all categorys -------------------------
 const getAllCategories = catchAsync(async (req, res, next) => {
+  console.log('esta llegando al requerimiento ');
   const categories = await Category.findAll({
     where: { status: 'active' },
   });

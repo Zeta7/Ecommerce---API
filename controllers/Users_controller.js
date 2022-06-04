@@ -69,8 +69,8 @@ const getAllUserProducts = catchAsync(async (req, res, next) => {
 const updateUser = catchAsync(async (req, res, next) => {
   const { user } = req; //user exist
   const { userName, email } = req.body;
-  await user.update({ userName, email });
-  res.status(200).json({ status: 'success' });
+  const upUser = await user.update({ userName, email });
+  res.status(200).json({ status: 'success', upUser });
 });
 
 //---------------------- dessable user -------------------------------

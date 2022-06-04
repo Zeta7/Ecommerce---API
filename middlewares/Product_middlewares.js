@@ -14,8 +14,18 @@ const productExists = catchAsync(async (req, res, next) => {
     return next(new AppError('Product does not exist with given Id', 404));
   }
 
-  req.product;
+  req.product = product;
   next();
 });
 
-module.exports = { productExists };
+//----------------------- protect product owner ------------------------------
+const protectProductOwner = catchAsync(async (req, res, next) => {
+  const { sessionUser } = req;
+  const { product } = req;
+  if (product.userId !== sessionUser.id) {
+    return next(new AppError('You do not own this account', 403));
+  }
+  next();
+});
+
+module.exports = { productExists, protectProductOwner };

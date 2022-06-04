@@ -24,7 +24,7 @@ const initModels = () => {
   ProductImg.belongsTo(Product);
 
   // 1 Category <--> 1 Product
-  Category.hasOne(Product);
+  Category.hasOne(Product, { foreignKey: 'categoryId' });
   Product.belongsTo(Category);
 
   // 1 Cart <--> M ProductInCart

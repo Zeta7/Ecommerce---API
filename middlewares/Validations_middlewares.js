@@ -20,17 +20,19 @@ const createCategoryValidations = [
 ];
 
 const createProductValidations = [
-  body('title').notEmpty().withMessage('Title cannot be empty'),
-  body('description').notEmpty().withMessage('Description cannot be empty'),
+  body('title').isString().notEmpty().withMessage('Enter a valid title'),
+  body('description')
+    .isString()
+    .notEmpty()
+    .withMessage('Enter a valid description'),
   body('price')
-    .isFloat({ min: 0 })
-    // .custom(val => {
-    //   return val > 0;
-    // })
-    .withMessage('Price must be greater than 0'),
+    .isDecimal()
+    .custom(value => value > 0)
+    .withMessage('Enter a valid price'),
   body('quantity')
-    .isInt({ min: 1 })
-    .withMessage('Quantity must be greater than 0'),
+    .isNumeric()
+    .custom(value => +value > 0)
+    .withMessage('Enter a valid quantity'),
   body('categoryId')
     .isInt({ min: 1 })
     .withMessage('Must provide a valid category'),
